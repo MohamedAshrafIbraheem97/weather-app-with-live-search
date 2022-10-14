@@ -16,7 +16,7 @@ const weatherDesc = document.querySelectorAll(".weather-desc span");
 const tomorrowDayText = document.querySelectorAll(
   ".second-degree-card .card-header"
 );
-// console.log(tomorrowDayText);
+// console.log(tomorrowDayText.innerText);
 const tomorrowImage = document.querySelectorAll(
   ".second-degree-card .blockquote img"
 );
@@ -79,12 +79,10 @@ function getTodayWeather(apiDataJson) {
 function getForecastWeather(apiDataJson) {
   for (let i = 0; i < 2; i++) {
     tomorrowDayText[i].innerText = getCurrentDate(
-      new Date(apiDataJson.forecast.forecastday[i + 1].date).getDate()
+      new Date(apiDataJson.forecast.forecastday[i].date).getDate()
     );
-
     tomorrowImage[i].src =
       apiDataJson.forecast.forecastday[i + 1].day.condition.icon;
-
     tomorrowHighestDegree[i].textContent =
       apiDataJson.forecast.forecastday[i + 1].day.maxtemp_c;
     tomorrowLowestDegree[i].textContent =
@@ -105,11 +103,11 @@ function getCurrentDate(dayNumber) {
     "Saturday",
   ];
   //   reseting dayNumber
-  if (dayNumber > 7) dayNumber = 0;
+  //   if (dayNumber > 7) dayNumber = 0;
 
-  for (const [index, day] of days.entries()) {
-    if (index == dayNumber) {
-      return day;
+  for (let i = 0; i < days.length; i++) {
+    if (i == dayNumber) {
+      return days[i];
     }
   }
 }
