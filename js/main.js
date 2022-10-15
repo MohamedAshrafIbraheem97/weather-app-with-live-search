@@ -1,5 +1,6 @@
 // api key
 const apiKey = "4e5ea1620ea14a21bfd234944221310";
+const baseUrl = "https://api.weatherapi.com/v1/";
 
 // search section
 const locationInput = document.querySelector("#searchInput");
@@ -16,7 +17,6 @@ const weatherDesc = document.querySelectorAll(".weather-desc span");
 const tomorrowDayText = document.querySelectorAll(
   ".second-degree-card .card-header"
 );
-// console.log(tomorrowDayText.innerText);
 const tomorrowImage = document.querySelectorAll(
   ".second-degree-card .blockquote img"
 );
@@ -39,21 +39,21 @@ locationInput.addEventListener("input", (e) => {
 
 async function searchWeather(cityNameFromSearch) {
   let apiResponse = await fetch(
-    `http://api.weatherapi.com/v1/search.json?key=${apiKey}&q=${cityNameFromSearch}`
+    `${baseUrl}search.json?key=${apiKey}&q=${cityNameFromSearch}`
   );
   let apiDataToBeUsed = await apiResponse.json();
   if (apiDataToBeUsed.length !== 0) {
     let latitude = apiDataToBeUsed[0].lat;
     let longitude = apiDataToBeUsed[0].lon;
-
-    getTodayWeather(await getWeather(`${latitude},${longitude}`));
-    getForecastWeather(await getWeather(`${latitude},${longitude}`));
+    apiDataToBeUsed = await getWeather(`${latitude},${longitude}`);
+    getTodayWeather(apiDataToBeUsed);
+    getForecastWeather(apiDataToBeUsed);
   }
 }
 
 async function getWeather(query) {
   let apiResponse = await fetch(
-    `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${query}&days=3&aqi=no&alerts=no`
+    `${baseUrl}forecast.json?key=${apiKey}&q=${query}&days=3&aqi=no&alerts=no`
   );
   let apiDataToBeUsed = await apiResponse.json();
   return apiDataToBeUsed;
@@ -79,7 +79,7 @@ function getTodayWeather(apiDataJson) {
 function getForecastWeather(apiDataJson) {
   for (let i = 0; i < 2; i++) {
     tomorrowDayText[i].innerText = getCurrentDate(
-      new Date(apiDataJson.forecast.forecastday[i].date).getDate()
+      new Date(apiDataJson.forecast.forecastday[i + 1].date).getDay()
     );
     tomorrowImage[i].src =
       apiDataJson.forecast.forecastday[i + 1].day.condition.icon;
@@ -102,8 +102,6 @@ function getCurrentDate(dayNumber) {
     "Friday",
     "Saturday",
   ];
-  //   reseting dayNumber
-  //   if (dayNumber > 7) dayNumber = 0;
 
   for (let i = 0; i < days.length; i++) {
     if (i == dayNumber) {
